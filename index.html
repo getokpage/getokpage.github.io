@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Social (placeholders, keep your own values) -->
+  <meta name="description" content="DESCRIPTION META TAG" />
+  <meta property="og:title" content="SOCIAL MEDIA TITLE TAG" />
+  <meta property="og:description" content="SOCIAL MEDIA DESCRIPTION META TAG TAG" />
+  <meta property="og:url" content="URL OF THE WEBSITE" />
+  <meta name="twitter:title" content="TWITTER BANNER TITLE META TAG" />
+  <meta name="twitter:description" content="TWITTER BANNER DESCRIPTION META TAG" />
+  <meta name="twitter:image" content="static/images/your_twitter_banner_image.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="keywords" content="KEYWORDS SHOULD BE PLACED HERE" />
+
+  <title>Grounding Everything in Tokens for Multimodal Large Language Models</title>
+  <link rel="icon" type="image/x-icon" href="static/images/favicon.ico" />
+
+  <link rel="stylesheet" href="static/css/bulma.min.css" />
+  <link rel="stylesheet" href="static/css/bulma-carousel.min.css" />
+  <link rel="stylesheet" href="static/css/bulma-slider.min.css" />
+  <link rel="stylesheet" href="static/css/fontawesome.all.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css" />
+  <!-- Your project CSS (kept) -->
+  <link rel="stylesheet" href="static/css/index.css" />
+
+  <style>
+    @font-face {
+      font-family: "DingTalk Sans";
+      src: url("static/fonts/DingTalkSans.ttf") format("truetype");
+      font-weight: 100 900;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    :root {
+      --brand: #0d6efd;
+      --ink: #101828;
+      --ink-soft: #475467;
+      --bg-soft: #f8fafc;
+      --card-bg: #ffffff;
+      --radius: 14px; /* 变量保留 */
+      --shadow: 0 10px 24px rgba(0,0,0,.06);
+      --shadow-soft: 0 6px 18px rgba(0,0,0,.06);
+      --container-w: 1000px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --ink: #e6e6e6;
+        --ink-soft: #c8c8c8;
+        --bg-soft: #0b0f14;
+        --card-bg: #12161c;
+        --shadow: 0 10px 24px rgba(0,0,0,.35);
+        --shadow-soft: 0 6px 18px rgba(0,0,0,.28);
+      }
+      body { background: #0b0f14; color: var(--ink); }
+      .hero.is-light { background: #0f141a !important; }
+      .card, .box { background: var(--card-bg) !important; }
+      .content p, .content li { color: var(--ink); }
+      figcaption { color: var(--ink-soft); }
+      .button.is-dark { background: #1f2937 !important; }
+    }
+
+    .container.is-max-desktop { max-width: var(--container-w) !important; }
+
+    .publication-title, .title {
+      font-family: "DingTalk Sans","Noto Sans","Google Sans",system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,"PingFang SC","Noto Sans CJK SC","Microsoft YaHei",sans-serif !important;
+      letter-spacing: .2px; color: var(--ink);
+    }
+    .publication-title {
+      line-height: 1.15; margin: 0 auto; max-width: 92%;
+      font-size: clamp(1.75rem, 1.2rem + 2.2vw, 3rem); font-weight: 800;
+    }
+    .title.is-3 { font-size: clamp(1.35rem, 1.05rem + 1.2vw, 1.9rem); font-weight: 700; }
+
+    .content p { color: var(--ink); }
+    .content em { font-style: italic; }
+    .content strong { font-weight: 650; color: var(--ink); }
+    .has-text-justified { text-align: justify; text-justify: inter-word; }
+
+    .hero .hero-body { padding: 2.4rem 1.25rem; }
+    .section { padding: 2.4rem 1.25rem; }
+    @media (max-width: 768px) { .hero .hero-body, .section { padding: 1.6rem 1rem; } }
+
+    .media-frame { max-width: var(--container-w); margin: 0 auto 1rem; }
+    .media-fluid {
+      width: 100%; height: auto; display: block;
+      box-shadow: var(--shadow);
+      border-radius: 0 !important;
+    }
+    .media-shadow-soft { box-shadow: var(--shadow-soft); }
+    figure.image { margin: 0 auto 1rem; }
+    figcaption { margin-top: .6rem; font-size: .95em; color: var(--ink-soft); line-height: 1.5; }
+
+    .teaser-video {
+      width: 100%; height: auto; max-width: 1000px; display: block; margin: 0 auto;
+      box-shadow: var(--shadow);
+      border-radius: 0 !important;
+    }
+
+    .card {
+      height: 100%;
+      border-radius: 0 !important;
+      box-shadow: var(--shadow);
+      background: var(--card-bg);
+      overflow: hidden;
+    }
+    .card .card-image,
+    .card .card-image img,
+    .card .card-content,
+    .card .card-footer { border-radius: 0 !important; }
+    .card .card-image { border-bottom: 1px solid rgba(0,0,0,.06); }
+    .card .card-content { padding: 1.1rem 1.2rem; }
+
+    figure.media-frame,
+    figure.media-frame img,
+    figure.image img,
+    .image img { border-radius: 0 !important; }
+
+    .columns.is-variable.is-6 { --columnGap: 1.5rem; }
+    .image.is-6by3 { background: var(--bg-soft); min-height: 210px; }
+    .image.is-16by9 { background: var(--bg-soft); min-height: 300px; }
+
+    @media (max-width: 768px) {
+      .image.is-6by3 { min-height: 160px !important; }
+      .image.is-16by9 { min-height: 200px !important; }
+      .columns.is-flex { flex-direction: column; }
+      .column.is-flex { margin-bottom: 1rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+      video[autoplay] { animation: none !important; }
+    }
+    .card--square { border-radius: 0 !important; }
+    .card--square .card-image,
+    .card--square .card-image .image,
+    .card--square .card-image img,
+    .card--square .card-content { border-radius: 0 !important; }
+
+    .figcap {
+      text-align: left;
+      font-size: .95em;
+      line-height: 1.5;
+      color: var(--ink-soft);
+      padding: .75rem 1rem 1rem 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .figcap { padding: .6rem .85rem .9rem .85rem; }
+    }
+  </style>
+</head>
+
+<body>
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column has-text-centered">
+            <h1 class="publication-title">Grounding Everything in Tokens for Multimodal Large Language Models</h1>
+
+            <div class="is-size-5 publication-authors" style="margin-top:.6rem;">
+              <span class="author-block"><a href="https://scholar.google.com/citations?user=P20Rk5oAAAAJ&hl=en" target="_blank">Xiangxuan Ren</a><sup>1</sup>,</span>
+              <span class="author-block"><a href="https://zhongdao.github.io/" target="_blank">Zhongdao Wang</a><sup>2</sup>,</span>
+              <span class="author-block"><a href="https://scholar.google.com/citations?hl=zh-CN&user=XoEzZukAAAAJ" target="_blank">Liping Hou</a><sup>2</sup>,</span>
+              <span class="author-block"><a href="https://scholar.google.com/citations?user=au87GKsAAAAJ&hl=en" target="_blank">Pin Tang</a><sup>1</sup>,</span>
+              <span class="author-block"><a href="https://wgqtmac.github.io/" target="_blank">Guoqing Wang</a><sup>1</sup>,</span>
+              <span class="author-block"><a href="https://vision.sjtu.edu.cn/" target="_blank">Chao Ma</a><sup>1</sup>,</span>
+            </div>
+
+            <div class="is-size-6" style="margin-top:.35rem;">
+              <span class="author-block"><sup>1</sup><a href="https://www.sjtu.edu.cn/" target="_blank">Shanghai Jiao Tong University</a>,</span>
+              <span class="author-block"><sup>2</sup><a href="https://www.huawei.com/cn/" target="_blank">Huawei Noah's Ark Lab</a></span>
+            </div>
+
+            <div class="publication-links" style="margin-top:.9rem;">
+              <a href="http://arxiv.org/abs/2512.10554" target="_blank"
+                class="external-link button is-normal is-rounded is-dark" rel="noopener">
+                <span class="icon"><i class="ai ai-arxiv"></i></span><span>arXiv</span>
+              </a>
+
+              <a href="https://github.com/YOUR_REPO_HERE" target="_blank"
+                class="external-link button is-normal is-rounded is-dark" rel="noopener">
+                <span class="icon"><i class="fab fa-github"></i></span><span>Code</span>
+              </a>
+
+
+              <a href="https://huggingface.co/datasets/YOUR_ORG/YOUR_DATASET" target="_blank"
+                class="external-link button is-normal is-rounded is-dark" rel="noopener">
+                  <span class="icon"><i class="fas fa-database"></i></span><span>Dataset</span>
+              </a>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="hero teaser">
+    <div class="container is-max-desktop">
+      <div class="hero-body">
+        <figure class="media-frame">
+          <video class="teaser-video" controls muted autoplay loop playsinline preload="metadata">
+            <source src="static/videos/teaser.mp4" type="video/mp4" />
+            Your browser does not support HTML5 video. You can <a href="static/videos/teaser.mp4">download the video</a> to watch it.
+          </video>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- Abstract -->
+  <section class="section hero is-light">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3" id="abstract-title">Abstract</h2>
+          <div class="content has-text-justified">
+            <p>
+              Multimodal large language models (MLLMs) have made significant advancements in vision understanding and reasoning.
+              However, the autoregressive Transformer architecture used by MLLMs requires tokenization on input images, which limits their ability to accurately ground objects within the 2D image space.
+              This raises an important question: how can sequential tokens be improved to better ground objects in 2D spatial space for MLLMs?
+              To address this, we present a spatial representation method for grounding objects, namely GETok, that integrates a specialized vocabulary of learnable tokens into MLLMs.
+              GETok first uses grid tokens to partition the image plane into structured spatial anchors, and then exploits offset tokens to enable precise and iterative refinement of localization predictions.
+              By embedding spatial relationships directly into tokens, GETok significantly advances MLLMs in native 2D space reasoning without modifying the autoregressive Transformer architecture.
+              Extensive experiments demonstrate that GETok achieves superior performance over the state-of-the-art methods across various referring tasks in both supervised fine-tuning and reinforcement learning settings.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-12 p-1 is-flex">
+        <div class="card h-100 card--square">
+          <!-- 标题 -->
+          <div class="card-content has-text-centered" style="padding-bottom:.75rem;">
+            <h2 class="title is-3" style="margin:0;">Why GETok?</h2>
+          </div>
+          <div class="card-image">
+            <figure class="image is-6by3" style="background: var(--bg-soft);">
+              <img
+                src="static/images/intro.png"
+                loading="lazy"
+                alt="Overview of GETok for spatial referencing"
+                style="object-fit: cover; height: 100%;"
+              />
+              <figcaption class="figcap">
+                <strong>Fig. 1.</strong>
+                <strong>Right</strong>: Comparison of token-based representations for grounding objects in MLLMs.
+                2D grid tokens preserve spatial topology with shorter sequences than coordinate-, patch-, or 1D bin-based formulations.
+                <strong>Left</strong>: (e) GETok establishes direct 2D spatial correspondences, yielding focused and consistent attention maps;
+                (f) the grid representation forms an RL-friendly action space for GRPO, enabling stable policy learning and faster convergence.
+              </figcaption>
+            </figure>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overview -->
+    <div class="columns is-centered">
+      <div class="column is-12 p-1 is-flex">
+        <div class="card h-100 card--square">
+          <div class="card-content">
+            <div class="content has-text-justified">
+              <p>
+                <strong>GETok</strong> addresses a core bottleneck of MLLMs: image tokenization often discards 2D spatial topology, making precise localization hard.
+                We introduce a learnable spatial vocabulary, with <em>grid tokens</em> that form a 2D anchor lattice and <em>offset tokens</em> that refine locations, so sequential tokens map smoothly to 2D image space.
+              </p>
+              <ul>
+                <li><strong>Unified Referring Representation:</strong> A unified representation from points to masks within a standard autoregressive framework, removing task-specific modules while keeping precision.</li>
+                <li><strong>Self-Correction:</strong> Iterative refinement with offsets enables the model to adjust spatial predictions and correct early mistakes.</li>
+                <li><strong>RL-friendly:</strong> Token shifts correspond to smooth spatial changes, yielding a low-entropy action space and stable reward landscapes for efficient policy optimization.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+  <!-- Data Curation -->
+  <section class="section">
+    <div class="container is-max-desktop">
+      <h3 class="title is-3 has-text-centered mb-6">Data Curation for Supervised Fine-Tuning with GETok</h3>
+
+      <div class="columns is-centered">
+        <div class="column is-12 p-1 is-flex">
+          <div class="card h-100">
+            <div class="card-image">
+              <figure class="image is-6by3">
+                <img src="static/images/pipeline.png" loading="lazy"
+                     alt="Greedy mask-to-token pipeline"
+                     style="object-fit: cover; height: 100%;" />
+              </figure>
+            </div>
+            <div class="card-content">
+              <div class="content has-text-justified">
+                <p>
+                  We propose a <strong>training-free greedy procedure</strong> to convert dense masks into discrete tokens.
+                  We prompt SAM at each grid point to obtain mask proposals and iteratively add the proposal
+                  with the largest IoU gain until a threshold &tau; is met, yielding the minimal token set
+                  that approximates the ground truth. The result is compact and unambiguous, avoids redundancy
+                  on multiply-connected regions, and requires no architectural changes.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="columns is-centered">
+        <div class="column is-12 p-1 is-flex">
+          <div class="card h-100">
+            <div class="card-image">
+              <figure class="image is-6by3">
+                <img src="static/images/dataset.png" loading="lazy"
+                     alt="Offset-aware dataset pipeline"
+                     style="object-fit: cover; height: 100%;" />
+              </figure>
+            </div>
+            <div class="card-content">
+              <div class="content has-text-justified">
+                <p>
+                  An <strong>offset-aware dataset</strong> is constructed by classifying grid points using morphology scaled to the offset step: Inside (0 offset), Ring (non-zero offsets near boundaries), Far, and Hard-Delete (mapped to <code>&lt;DELETE&gt;</code>). An ordered rule assigns each point to exactly one region, and sampling prioritizes Inside/Ring, producing a per-image set of K grid–offset pairs that concentrates learning on boundary-proximal corrections. This simulated supervision carries higher informational value than auto-generated labels and yields stronger refinement.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Self-Improving RL -->
+  <section class="section">
+    <div class="container is-max-desktop">
+      <h3 class="title is-3 has-text-centered mb-6">Self-Improving Reinforcement Learning</h3>
+      <div class="columns is-centered">
+        <div class="column is-12 p-1 is-flex">
+          <div class="card h-100">
+            <div class="card-image">
+              <figure class="image is-6by3">
+                <img src="static/images/RL_overview.png" loading="lazy"
+                     alt="Self-improving RL overview"
+                     style="object-fit: cover; height: 100%;" />
+              </figure>
+            </div>
+            <div class="card-content">
+              <div class="content has-text-justified">
+                <p>
+                  The structured nature of GETok offers an ideal framework
+                  for reinforcement learning due to its 2D lattice organization,
+                  which creates a geometrically grounded action space rich in
+                  spatial semantics. We introduce a novel <strong>self-improving reinforcement learning framework</strong> that utilizes the grid-offset
+                  hierarchy of GETok to enable iterative self-correction.
+                  This mechanism mitigates the brittleness of one-shot predictions in prior work and enables fine-grained, boundary-accurate mask refinement.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+<!-- Results -->
+<section class="hero is-small" id="results">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column">
+          <h2 class="title is-3">Experimental Results</h2>
+          <div id="more-qualitative">
+            <figure class="media-frame">
+              <img
+                src="static/images/visualization3.png"
+                loading="lazy"
+                alt="Qualitative results of segmentation task."
+                class="media-fluid" />
+              <figcaption style="text-align:left;">
+                <strong>Qualitative results of segmentation task.</strong> GETok demonstrates adaptive corrections, achieving precise localization across diverse scenarios, including small objects and complex shapes.
+              </figcaption>
+            </figure>
+
+            <figure class="media-frame">
+              <img
+                src="static/images/case2.png"
+                loading="lazy"
+                alt="More qualitative results of the self-improving mechanism in GETok"
+                class="media-fluid" />
+              <figcaption style="text-align:left;">
+                <strong>Qualitative results of the self-improving mechanism.</strong>
+                Additional examples demonstrate how GETok establishes initial spatial proposals through grid tokens (red dots)
+                and enables fine-grained adjustments via offset tokens (blue arrows), showing effective handling of objects across
+                scales with enhanced precision on small targets.
+              </figcaption>
+            </figure>
+          </div>
+
+          <!-- Main quantitative figure -->
+          <figure class="media-frame" style="max-width: 880px;">
+            <img
+              src="static/images/experiment.png"
+              loading="lazy"
+              alt="Experimental results"
+              class="media-fluid" />
+          </figure>
+          <div class="content has-text-justified">
+            <p>
+              Extensive experiments demonstrate that GETok achieves superior performance over the state-of-the-art methods
+              across various referring tasks in both <strong>supervised fine-tuning and reinforcement learning</strong> contexts.
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+  <!-- BibTeX -->
+  <section class="section" id="BibTeX">
+    <div class="container is-max-desktop content">
+      <h2 class="title">BibTeX</h2>
+      <pre><code>
+@article{,
+  title={Grounding Everything in Tokens for Multimodal Large Language Models},
+  author={Xiangxuan Ren and Zhongdao Wang and Liping Hou and Pin Tang and Guoqing Wang and Chao Ma},
+  journal={arXiv preprint arXiv:2512.10554},
+  year={2025}
+}
+      </code></pre>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer" style="background:transparent;">
+    <div class="container">
+      <div class="columns is-centered">
+        <div class="column is-8">
+          <div class="content">
+            <p>
+              This page was built using the
+              <a href="https://github.com/eliahuhorwitz/Academic-project-page-template" target="_blank">Academic Project Page Template</a>
+              which was adopted from the <a href="https://nerfies.github.io" target="_blank">Nerfies</a> project page.
+              <br />This website is licensed under a
+              <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank">
+                Creative Commons Attribution-ShareAlike 4.0 International License
+              </a>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JS -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="static/js/fontawesome.all.min.js"></script>
+  <script src="static/js/bulma-carousel.min.js"></script>
+  <script src="static/js/bulma-slider.min.js"></script>
+  <script src="static/js/index.js"></script>
+</body>
+</html>
